@@ -13,7 +13,7 @@ export default function HomePage() {
     if (isAuthenticated()) {
       router.push('/dashboard');
     }
-  }, []);
+  }, [router]); // ✅ Added 'router' to dependency array
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
