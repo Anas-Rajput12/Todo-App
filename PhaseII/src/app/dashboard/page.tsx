@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Task, TaskCreateRequest } from '../../../../shared/types';
+import { Task, TaskCreateRequest, User } from '@/shared/types';
+
 import { apiClient } from '../../lib/api-client';
 import { isAuthenticated, clearAuthData } from '../../lib/auth';
 import TaskList from '../../components/tasks/TaskList';
@@ -18,14 +19,15 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
-      return;
-    }
+ useEffect(() => {
+  if (!isAuthenticated()) {
+    router.push('/login');
+    return;
+  }
 
-    fetchTasks();
-  }, []);
+  fetchTasks();
+}, [router]); // add router as dependency
+
 
   const fetchTasks = async () => {
     try {
