@@ -18,8 +18,9 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",           // ✅ base dir = project root
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]          // ✅ @/shared/... maps to Phase II/shared/...
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
