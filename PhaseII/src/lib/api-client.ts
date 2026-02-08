@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { User, UserLogin, UserRegistration, LoginResponse, Task, TaskCreateRequest, TaskUpdateRequest, TaskListResponse, TaskToggleCompleteRequest } from '../../../shared/types';
 
-const API_BASE_URL = (https://muhammadanasqadri-todos.hf.space);
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL);
 
 // const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || 'https://muhammadanasqadri-hackathon2.hf.space/v1').replace(/\/$/, '');
 
