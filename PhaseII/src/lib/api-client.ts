@@ -1,9 +1,31 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { User, UserLogin, UserRegistration, LoginResponse, Task, TaskCreateRequest, TaskUpdateRequest, TaskListResponse, TaskToggleCompleteRequest } from '../../../shared/types';
 
 const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL);
 
-// const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || 'https://muhammadanasqadri-hackathon2.hf.space/v1').replace(/\/$/, '');
+
+// Define types for chatbot functionality
+interface ChatMessageRequest {
+  sessionId?: string;
+  message: string;
+}
+
+interface ChatMessageResponse {
+  sessionId: string;
+  response: string;
+  intent: string;
+  actionResult: any;
+  requiresConfirmation: boolean;
+  timestamp: string;
+}
+
+interface GetSessionsResponse {
+  sessions: Array<{
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+    isActive: boolean;
+  }>;
+}
 
 class ApiClient {
   private axiosClient: AxiosInstance;
@@ -200,6 +222,43 @@ class ApiClient {
       if (error.response?.status === 404) {
         const response = await this.axiosClient.patch(`/tasks/${id}/complete`, completeData);
         return response.data as Task;
+      }
+      throw error;
+    }
+  }
+
+  // Chatbot methods
+  async sendMessage(message: string, sessionId?: string): Promise<ChatMessageResponse> {
+    try {
+      // Try v1 prefix first, then fall back to direct route
+      const response = await this.axiosClient.post('/v1/chatbot/message', {
+        message,
+        sessionId
+      });
+      return response.data as ChatMessageResponse;
+    } catch (error) {
+      // If v1 prefix fails, try without it
+      if (error.response?.status === 404) {
+        const response = await this.axiosClient.post('/chatbot/message', {
+          message,
+          sessionId
+        });
+        return response.data as ChatMessageResponse;
+      }
+      throw error;
+    }
+  }
+
+  async getUserSessions(): Promise<GetSessionsResponse> {
+    try {
+      // Try v1 prefix first, then fall back to direct route
+      const response = await this.axiosClient.get('/v1/chatbot/sessions');
+      return response.data as GetSessionsResponse;
+    } catch (error) {
+      // If v1 prefix fails, try without it
+      if (error.response?.status === 404) {
+        const response = await this.axiosClient.get('/chatbot/sessions');
+        return response.data as GetSessionsResponse;
       }
       throw error;
     }
