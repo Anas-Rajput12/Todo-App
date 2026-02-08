@@ -8,11 +8,13 @@ import { apiClient } from '../../lib/api-client';
 import { isAuthenticated, clearAuthData } from '../../lib/auth';
 import TaskList from '../../components/tasks/TaskList';
 import TaskForm from '../../components/tasks/TaskForm';
+import ChatBotPanel from '../../components/chat/ChatBotPanel';
 
 export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all');
   const [success, setSuccess] = useState<string | null>(null);
@@ -327,6 +329,19 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            <div className="mt-6 space-y-1">
+              <a
+                href="/ai-chatbot"
+                className="w-full flex items-center px-3 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gradient-to-r from-indigo-100 to-purple-100 hover:text-indigo-600 hover:translate-x-1 transition-all duration-200 border border-transparent hover:border-indigo-200"
+              >
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mr-3 shadow-md">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span className="font-medium bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">AI Chatbot</span>
+              </a>
+            </div>
             <div className="mt-8 pt-6 border-t border-gray-200">
               <button
                 onClick={handleLogout}
@@ -454,6 +469,20 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
+                    <div className="mt-6 space-y-1">
+                      <a
+                        href="/ai-chatbot"
+                        onClick={() => setSidebarOpen(false)}
+                        className="w-full flex items-center px-3 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gradient-to-r from-indigo-100 to-purple-100 hover:text-indigo-600 hover:translate-x-1 transition-all duration-200 border border-transparent hover:border-indigo-200"
+                      >
+                        <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mr-3 shadow-md">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <span className="font-medium bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">AI Chatbot</span>
+                      </a>
+                    </div>
                     <div className="mt-8 pt-6 border-t border-gray-200">
                       <button
                         onClick={() => {
@@ -589,9 +618,9 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Task List */}
+          {/* Full-width Task list */}
           <div className="bg-white/70 backdrop-blur-sm bg-opacity-80 shadow-xl rounded-3xl border border-gray-100 overflow-hidden">
-            <div className="sm:rounded-3xl">
+            <div className="sm:rounded-3xl p-6">
               <TaskList
                 tasks={filteredTasks}
                 onTaskUpdate={(task) => {
@@ -608,18 +637,59 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Floating action button for mobile */}
+          {/* Floating action buttons */}
+          {/* Chatbot button */}
+          {/* <button
+            onClick={() => setShowChatbot(true)}
+            className="fixed bottom-24 right-6 inline-flex items-center justify-center p-4 border border-transparent text-base font-semibold rounded-full shadow-2xl text-white bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-110 z-30"
+            aria-label="Open AI Chatbot"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
+            </svg>
+          </button> */}
+          
+          {/* Add task button (existing) */}
           <button
-            onClick={() => setShowForm(true)}
-            className="fixed bottom-8 right-6 md:hidden inline-flex items-center justify-center p-5 border border-transparent text-base font-semibold rounded-full shadow-2xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-110 z-10 animate-pulse"
+            onClick={() => setShowChatbot(true)}
+            className="fixed bottom-8 right-6 inline-flex items-center justify-center p-5 border border-transparent text-base font-semibold rounded-full shadow-2xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-110 z-20 animate-pulse"
             aria-label="Add new task"
           >
-            <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
             </svg>
           </button>
         </div>
       </div>
+
+      {/* Chatbot Modal */}
+      {showChatbot && (
+        <div className="fixed inset-0 z-40 bg-black bg-opacity-50 flex items-center justify-center p-4" onClick={() => setShowChatbot(false)}>
+          <div className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+              <div className="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex justify-between items-center">
+                <h3 className="text-lg font-semibold flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z" clipRule="evenodd" />
+                  </svg>
+                  AI Assistant
+                </h3>
+                <button 
+                  onClick={() => setShowChatbot(false)}
+                  className="text-white hover:text-gray-200"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4 max-h-96 overflow-y-auto">
+                <ChatBotPanel compact={false} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
