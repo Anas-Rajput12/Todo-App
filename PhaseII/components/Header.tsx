@@ -51,9 +51,20 @@ const Header = () => {
                     : 'text-gray-600 hover:text-indigo-600'
                 }`}
             >
-              Sign in
+               AI Chatbot
             </Link>
-
+                <Link
+              href="/login"
+              className={`text-sm font-semibold transition-all
+                ${
+                  pathname === '/login'
+                    ? 'text-indigo-600 underline underline-offset-4'
+                    : 'text-gray-600 hover:text-indigo-600'
+                }`}
+            >
+              Sign in
+             
+            </Link>
             <Link
               href="/signup"
               className="inline-flex items-center justify-center
@@ -64,6 +75,8 @@ const Header = () => {
             >
               Get Started
             </Link>
+            
+            
           </nav>
 
           {/* Mobile menu button */}
