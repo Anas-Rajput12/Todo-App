@@ -1,0 +1,144 @@
+# Default values for todo-app Helm chart (local Minikube)
+
+# Global settings for local deployment
+global:
+  localDeployment: true
+  # Optional: cluster IP if needed
+  clusterIP: ""
+
+# Backend configuration
+backend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: todo-app-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  env:
+    # Add backend environment variables here
+    # Example:
+    # - name: DATABASE_URL
+    #   value: "postgresql://user:pass@db:5432/todos"
+    # - name: SECRET_KEY
+    #   value: "your-secret-key"
+
+# Frontend configuration
+frontend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: todo-app-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  env:
+    - name: NEXT_PUBLIC_API_BASE_URL
+      value: "http://localhost:8000"  # Frontend calls backend via localhost with port-forward
+
+# Service Account (shared)
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+# Pod settings
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+
+# Ingress configuration for Minikube
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: todo-app.local
+      paths:
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: todo-app-backend
+              port:
+                number: 8000
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: todo-app-frontend
+              port:
+                number: 3000
+  tls: []
+
+# HTTPRoute (disabled for local Minikube)
+httpRoute:
+  enabled: false
+
+# Autoscaling (disabled for local deployment)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+# NodePort for easy local access
+nodePort:
+  enabled: true
+  backendPort: 30001
+  frontendPort: 30002
+
+# Additional volumes
+volumes: []
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

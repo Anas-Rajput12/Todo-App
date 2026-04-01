@@ -1,0 +1,37 @@
+{{- if .Values.backend.enabled -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "todo-app.fullname" . }}-backend-test-connection"
+  labels:
+    {{- include "todo-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "todo-app.fullname" . }}-backend:{{ .Values.backend.service.port }}/health']
+  restartPolicy: Never
+{{- end }}
+---
+{{- if .Values.frontend.enabled -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "todo-app.fullname" . }}-frontend-test-connection"
+  labels:
+    {{- include "todo-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "todo-app.fullname" . }}-frontend:{{ .Values.frontend.service.port }}/']
+  restartPolicy: Never
+{{- end }}

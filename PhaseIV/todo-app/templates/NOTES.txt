@@ -1,0 +1,71 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+=== LOCAL DEPLOYMENT GUIDE FOR MINIKUBE ===
+
+1. Get the application URLs:
+
+{{- if .Values.ingress.enabled }}
+   Via Ingress (recommended for Minikube with ingress addon):
+   
+   First, enable ingress in Minikube:
+   $ minikube addons enable ingress
+   
+   Get the Minikube IP:
+   $ minikube ip
+   
+   Add to your hosts file (C:\Windows\System32\drivers\etc\hosts on Windows):
+   $(minikube ip) todo-app.local
+   
+   Then access:
+   - Frontend: http://todo-app.local/
+   - Backend API: http://todo-app.local/api
+{{- end }}
+
+{{- if .Values.nodePort.enabled }}
+   Via NodePort (direct access without ingress):
+   
+   Backend API:  http://$(minikube ip):{{ .Values.nodePort.backendPort }}
+   Frontend:     http://$(minikube ip):{{ .Values.nodePort.frontendPort }}
+   
+   Or run these commands:
+   $ minikube ip
+   $ kubectl get svc -n {{ .Release.Namespace }}
+{{- end }}
+
+2. Check deployment status:
+   $ kubectl get pods -n {{ .Release.Namespace }}
+   $ kubectl get svc -n {{ .Release.Namespace }}
+   $ kubectl get ingress -n {{ .Release.Namespace }}
+
+3. View logs:
+   Backend:  $ kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/component=backend -f
+   Frontend: $ kubectl logs -n {{ .Release.Namespace }} -l app.kubernetes.io/component=frontend -f
+
+4. Port forwarding (alternative access):
+   Backend:  $ kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "todo-app.fullname" . }}-backend 8000:8000
+   Frontend: $ kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "todo-app.fullname" . }}-frontend 3000:3000
+
+5. Test the deployment:
+   Backend health: curl http://localhost:8000/health
+   Frontend:       curl http://localhost:3000/
+
+6. Uninstall:
+   $ helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+=== IMAGE CONFIGURATION ===
+Backend image:  {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
+Frontend image: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
+
+Note: Make sure your Docker images are loaded into Minikube:
+$ minikube image load todo-app-backend:latest
+$ minikube image load todo-app-frontend:latest
+
+Or build directly in Minikube:
+$ eval $(minikube docker-env)
+$ docker build -t todo-app-backend:latest ./backend
+$ docker build -t todo-app-frontend:latest ./frontend
+
+Happy coding! 🚀
